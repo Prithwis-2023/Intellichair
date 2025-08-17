@@ -1,0 +1,18 @@
+{
+  "projectName": "Intellichair",
+  "projectOwner": "Prithwis-2023",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": ["README.md"],
+  "imageSize": 100,
+  "commit": true,
+  "contributors": [
+    {
+      "login": "azizkayumov",       
+      "name": "Aziz Kayumov",     
+      "avatar_url": "https://avatars.githubusercontent.com/u/14273342?v=4",
+      "profile": "https://github.com/azizkayumov",
+      "contributions": ["code"] 
+    }
+  ]
+}
