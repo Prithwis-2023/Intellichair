@@ -22,10 +22,10 @@ When ready, place the known weight onto the cell and press ENTER in the Serial M
 // Init and HX711 to Arduino wiring
 HX711 Scale1, Scale2, Scale3, Scale4;
 
-uint8_t LOADCELL_DOUT_PINS[4] = {2, 3, 4, 5};
-uint8_t LOADCELL_SCK_PINS[4] = {9, 10, 11, 12};
+const uint8_t LOADCELL_DOUT_PINS[4] = {2, 3, 4, 5};
+const uint8_t LOADCELL_SCK_PINS[4] = {9, 10, 11, 12};
+const float CALIBRATION[4] = {-125.30, 173.22, 187.26, -196.06};
 
-//const float calibration_factors[4] = {};
 
 // Buzzer pin (passive buzzer)
 const int buzzerPin = A0;
@@ -39,10 +39,10 @@ const float SI_HARD_LIMIT = 20;  // for a strong warning
 void setup() 
 {
   Serial.begin(9600);
-  Serial.println(calibrateCell (1520, 0));
-  Serial.println(calibrateCell (1520, 1));
-  Serial.println(calibrateCell (1520, 2));
-  Serial.println(calibrateCell (1520, 3));
+  // Serial.println(calibrateCell (1520, 0));
+  // Serial.println(calibrateCell (1520, 1));
+  // Serial.println(calibrateCell (1520, 2));
+  // Serial.println(calibrateCell (1520, 3));
 
   Scale1.begin(LOADCELL_DOUT_PINS[0], LOADCELL_SCK_PINS[0]);
   Scale2.begin(LOADCELL_DOUT_PINS[1], LOADCELL_SCK_PINS[1]);
@@ -53,10 +53,10 @@ void setup()
 
 
   // set the calibration factor and reset the scale to 0 using the tare() function
-  // Scale1.set_scale(); Scale1.tare();
-  // Scale2.set_scale(); Scale2.tare();
-  // Scale3.set_scale(); Scale3.tare();
-  // Scale4.set_scale(); Scale4.tare();        
+  Scale1.set_scale(CALIBRATION[0]); Scale1.tare();
+  Scale2.set_scale(CALIBRATION[1]); Scale2.tare();
+  Scale3.set_scale(CALIBRATION[2]); Scale3.tare();
+  Scale4.set_scale(CALIBRATION[3]); Scale4.tare();        
 
 }
 
