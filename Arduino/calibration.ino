@@ -32,7 +32,7 @@ float calibrateCell (float knownWeight, uint8_t index)
 
   float calib = rawAvg / knownWeight;
 
-  return calib;
+  return calib;  // per gram 
 
   tone(buzzerPin, 1000);
   delay(100);
