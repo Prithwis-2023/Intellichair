@@ -1,6 +1,24 @@
 // Imports
 #include "HX711.h"
 
+/*
+TARE done. Make sure nothing is on the sensor now.
+When ready, place the known weight onto the cell and press ENTER in the Serial Monitor...
+-125.30
+Calibrating Cell: 2
+TARE done. Make sure nothing is on the sensor now.
+When ready, place the known weight onto the cell and press ENTER in the Serial Monitor...
+173.22
+Calibrating Cell: 3
+TARE done. Make sure nothing is on the sensor now.
+When ready, place the known weight onto the cell and press ENTER in the Serial Monitor...
+187.26
+Calibrating Cell: 4
+TARE done. Make sure nothing is on the sensor now.
+When ready, place the known weight onto the cell and press ENTER in the Serial Monitor...
+-196.06
+*/
+
 // Init and HX711 to Arduino wiring
 HX711 Scale1, Scale2, Scale3, Scale4;
 
@@ -21,10 +39,10 @@ const float SI_HARD_LIMIT = 20;  // for a strong warning
 void setup() 
 {
   Serial.begin(9600);
-  calibrateCell (197, 0);
-  calibrateCell (197, 1);
-  calibrateCell (197, 2);
-  calibrateCell (197, 3);
+  Serial.println(calibrateCell (1520, 0));
+  Serial.println(calibrateCell (1520, 1));
+  Serial.println(calibrateCell (1520, 2));
+  Serial.println(calibrateCell (1520, 3));
 
   Scale1.begin(LOADCELL_DOUT_PINS[0], LOADCELL_SCK_PINS[0]);
   Scale2.begin(LOADCELL_DOUT_PINS[1], LOADCELL_SCK_PINS[1]);
