@@ -1,85 +1,69 @@
-// Imports
 #include "HX711.h"
 
-// Init and HX711 to Arduino wiring
-HX711 ScaleBR, ScaleBL, ScaleTL, ScaleTR;
+// HX711 circuit wiring
+const int LOADCELL_DOUT_PINS[4] = {2, 3, 4, 5};
+const int LOADCELL_SCK_PINS[4] = {9, 10, 11, 12};
+const float CALIBRATIONS[4] = {-578312.19, 2911352.00, 1047461.44, 2131984.75};  // accomplished based on the documentation: github.com/RobTillaart/HX711/tree/master
+const int chassisLength = 300;  // TBD
+const int SI_THRESHOLD = 15;
+const int CoPx_THRESHOLD = 30;  // in mm
+//const int ledPin = 6;
+const int buzzerPin = A0;  // passive buzzer
 
-const uint8_t LOADCELL_DOUT_PINS[4] = {2, 3, 4, 5};
-const uint8_t LOADCELL_SCK_PINS[4] = {9, 10, 11, 12};
-const float CALIBRATION[4] = {-125.30, 173.22, 187.26, -196.06};
-
-// Buzzer pin (passive buzzer)
-const int buzzerPin = A0;
-
-// SI thresholds
-const float SI_SOFT_LIMIT = 10;  // for a mild warning
-const float SI_HARD_LIMIT = 20;  // for a strong warning
-
-
-//loadCalibrationFromEEPROM();
+HX711 scaleTR, scaleBR, scaleBL, scaleTL;  // cells 1 and 2 are right ans cells 3 and 4 are left, with reference to arduino jack
 
 void setup() 
 {
-  Serial.begin(9600);
+  Serial.begin(57600);  // suggested baud rate online
 
-  // Serial.println(calibrateCell (1520, 0));
-  // Serial.println(calibrateCell (1520, 1));
-  // Serial.println(calibrateCell (1520, 2));
-  // Serial.println(calibrateCell (1520, 3));
+  while(!Serial);
+  
+  scaleTR.begin(LOADCELL_DOUT_PINS[0], LOADCELL_SCK_PINS[0]);
+  scaleBR.begin(LOADCELL_DOUT_PINS[1], LOADCELL_SCK_PINS[1]);
+  scaleBL.begin(LOADCELL_DOUT_PINS[2], LOADCELL_SCK_PINS[2]);
+  scaleTL.begin(LOADCELL_DOUT_PINS[3], LOADCELL_SCK_PINS[3]);
 
-  ScaleBR.begin(LOADCELL_DOUT_PINS[0], LOADCELL_SCK_PINS[0]);
-  ScaleBL.begin(LOADCELL_DOUT_PINS[1], LOADCELL_SCK_PINS[1]);
-  ScaleTL.begin(LOADCELL_DOUT_PINS[2], LOADCELL_SCK_PINS[2]);
-  ScaleTR.begin(LOADCELL_DOUT_PINS[3], LOADCELL_SCK_PINS[3]);
-
-  pinMode(buzzerPin, OUTPUT); 
-
-
-  // set the calibration factor and reset the scale to 0 using the tare() function
-  ScaleBR.set_scale(CALIBRATION[0]); ScaleBR.tare();
-  ScaleBL.set_scale(CALIBRATION[1]); ScaleBL.tare();
-  ScaleTL.set_scale(CALIBRATION[2]); ScaleTL.tare();
-  ScaleTR.set_scale(CALIBRATION[3]); ScaleTR.tare();        
-
+  pinMode(ledPin, OUTPUT);
+  
+  // calibrate the scales
+  scaleTR.set_scale(CALIBRATIONS[0]);
+  scaleBR.set_scale(CALIBRATIONS[1]);
+  scaleBL.set_scale(CALIBRATIONS[2]);
+  scaleTL.set_scale(CALIBRATIONS[3]);
 }
 
 void loop() 
 {
-  float wBR = ScaleBR.get_units(10);
-  float wBL = ScaleBL.get_units(10);
-  float wTL = ScaleTL.get_units(10);
-  float wTR = ScaleTR.get_units(10);
-
-  float leftSide = abs(wTL) + abs(wBL);
-  float rightSide = abs(wTR) + abs(wBR);
-  float total = abs(wBR) + abs(wBL) + abs(wTL) + abs(wTR);
-  float leftNorm = leftSide / total;
-  float rightNorm = rightSide / total;
-  float SI = (leftNorm - rightNorm) * 100;
-
-  // Debug DEBUG
-  Serial.print("BR: "); Serial.print(wBR, 2);
-  Serial.print("  BL: "); Serial.print(wBL, 2);
-  Serial.print("  TL: "); Serial.print(wTL, 2);
-  Serial.print("  TR: "); Serial.print(wTR, 2);
-  Serial.print("  Total: "); Serial.print(total, 2);
-  Serial.print("  SI: "); Serial.println(SI, 2);
-
-  // Buzzer alerts based on SI thresholds
-  if (abs(SI) >= SI_HARD_LIMIT) 
+  if (scaleTR.is_ready() && scaleBR.is_ready() && scaleBL.is_ready() && scaleTL.is_ready()) 
   {
-    tone(buzzerPin, 1000);  // strong warning
-    //noTone(buzzerPin);
+    float readingTR = fabs(scaleTR.get_units(10));
+    float readingBR = fabs(scaleBR.get_units(10));
+    float readingBL = fabs(scaleBL.get_units(10));
+    float readingTL = fabs(scaleTL.get_units(10));
+    float total = readingTR + readingBR + readingBL + readingTL;
+    
+    Serial.print("HX711 reading: ");
+
+    float rightSideNorm = (readingTR + readingBR) / total; 
+    float leftSideNorm = (readingBL + readingTL) / total;
+    Serial.print(leftSideNorm); Serial.print(" "); Serial.println(rightSideNorm);
+
+    float SI = fabs(rightSideNorm - leftSideNorm) * 100.0f;
+    float CoPx = (chassisLength * 0.5f) * fabs(rightSideNorm - leftSideNorm);
+    Serial.println(SI);
+    Serial.println(CoPx);
+
+    if (SI >= SI_THRESHOLD && CoPx >= CoPx_THRESHOLD)
+    {
+      //digitalWrite(ledPin, HIGH);
+      tone(buzzerPin, 1000);  // strong warning
+      
+    }
+    else
+    {
+      //digitalWrite(ledPin, LOW);
+      noTone(buzzerPin);
+    }
   } 
-  else if (abs(SI) >= SI_SOFT_LIMIT) 
-  {
-    tone(buzzerPin, 200);   // mild warning
-    //noTone(buzzerPin);
-  } 
-  else 
-  {
-    noTone(buzzerPin);      // safe posture
-  }
-
-  delay(500);  // adjust reading interval
+  delay(1000); 
 }
