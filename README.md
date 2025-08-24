@@ -32,7 +32,7 @@ where, O1 is the observed loading and P1 is the prescribed loading, which has be
 
 ### Center of Pressure (CoP) Metric
 
-The **center of pressure (CoP)** is a key concept in biomechanics and postural control studies, and it’s exactly what researchers use the **Nintendo Wii Balance Board** for. If the subject is sitting or standing on a surface with **4 load sensors**, each sensor measures a portion of the subject's total weight. The **CoP** is the **weighted average point of pressure** where the net vertical force acts. Therefore, if the **subject leans left, the CoP leans left**, if the **subject leans right, the CoP leans right** and if the **subject sits sits perfectly balanced, the CoP stays in the middle**. 
+The **center of pressure (CoP)** is a key concept in biomechanics and postural control studies, and it’s exactly what researchers use the **Nintendo Wii Balance Board** for. If the subject is sitting or standing on a surface with **4 load sensors**, each sensor measures a portion of the subject's total weight. The **CoP** is the **weighted average point of pressure** where the net vertical force acts. Therefore, if the **subject leans left, the CoP leans left**, if the **subject leans right, the CoP leans right** and if the **subject sits perfectly balanced, the CoP stays in the middle**. 
 
 ![1-s2 0-S0966636213003184-gr1_lrg](https://github.com/user-attachments/assets/ca44076f-3be6-4d2a-a1db-6418d3d795f3)
 
