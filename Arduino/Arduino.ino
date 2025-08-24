@@ -3,7 +3,7 @@
 // HX711 circuit wiring
 const int LOADCELL_DOUT_PINS[4] = {2, 3, 4, 5};
 const int LOADCELL_SCK_PINS[4] = {9, 10, 11, 12};
-const float CALIBRATIONS[4] = {-578312.19, 2911352.00, 1047461.44, 2131984.75};  // accomplished based on the documentation: github.com/RobTillaart/HX711/tree/master
+const float CALIBRATIONS[4] = {1.0, 1.0, 1.0, 1.0};  // accomplished based on the documentation: github.com/RobTillaart/HX711/tree/master
 const int chassisLength = 300;  // TBD
 const int SI_THRESHOLD = 15;
 const int CoPx_THRESHOLD = 30;  // in mm
