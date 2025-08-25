@@ -6,7 +6,6 @@
 float x, y, z;
 int angleX = 0;
 int angleY = 0;
-unsigned long previousMillis = 0;
 
 // HX711 circuit wiring
 const int LOADCELL_DOUT_PINS[4] = {2, 3, 4, 5};
