@@ -1,4 +1,12 @@
 #include "HX711.h"
+#include "Arduino_BMI270_BMM150.h"
+
+#define MINIMUM_TILT 20
+
+float x, y, z;
+int angleX = 0;
+int angleY = 0;
+unsigned long previousMillis = 0;
 
 // HX711 circuit wiring
 const int LOADCELL_DOUT_PINS[4] = {2, 3, 4, 5};
@@ -7,45 +15,56 @@ const float CALIBRATIONS[4] = {1.0, 1.0, 1.0, 1.0};  // accomplished based on th
 const int chassisLength = 300;  // TBD
 const int SI_THRESHOLD = 15;
 const int CoPx_THRESHOLD = 30;  // in mm
-//const int ledPin = 6;
-const int buzzerPin = A0;  // passive buzzer
 
-HX711 scaleTR, scaleBR, scaleBL, scaleTL;  // cells 1 and 2 are right ans cells 3 and 4 are left, with reference to arduino jack
+const int buzzerPin = 6;  // passive buzzer
+
+HX711 scaleFR, scaleBR, scaleBL, scaleFL; 
 
 void setup() 
 {
   Serial.begin(57600);  // suggested baud rate online
 
   while(!Serial);
-  
-  scaleTR.begin(LOADCELL_DOUT_PINS[0], LOADCELL_SCK_PINS[0]);
+
+  if (!IMU.begin())
+  {
+    Serial.println("Failed to initialize IMU!");
+    while (1);
+  }
+  Serial.print("Accelerometer sample rate = ");
+  Serial.print(IMU.accelerationSampleRate());
+  Serial.println(" Hz");
+
+  scaleFR.begin(LOADCELL_DOUT_PINS[0], LOADCELL_SCK_PINS[0]);
   scaleBR.begin(LOADCELL_DOUT_PINS[1], LOADCELL_SCK_PINS[1]);
   scaleBL.begin(LOADCELL_DOUT_PINS[2], LOADCELL_SCK_PINS[2]);
-  scaleTL.begin(LOADCELL_DOUT_PINS[3], LOADCELL_SCK_PINS[3]);
-
-  pinMode(ledPin, OUTPUT);
+  scaleFL.begin(LOADCELL_DOUT_PINS[3], LOADCELL_SCK_PINS[3]);
   
   // calibrate the scales
-  scaleTR.set_scale(CALIBRATIONS[0]);
+  scaleFR.set_scale(CALIBRATIONS[0]);
   scaleBR.set_scale(CALIBRATIONS[1]);
   scaleBL.set_scale(CALIBRATIONS[2]);
-  scaleTL.set_scale(CALIBRATIONS[3]);
+  scaleFL.set_scale(CALIBRATIONS[3]);
 }
 
 void loop() 
 {
-  if (scaleTR.is_ready() && scaleBR.is_ready() && scaleBL.is_ready() && scaleTL.is_ready()) 
+  if (IMU.accelerationAvailable() && scaleFR.is_ready() && scaleBR.is_ready() && scaleBL.is_ready() && scaleFL.is_ready()) 
   {
-    float readingTR = fabs(scaleTR.get_units(10));
+    IMU.readAcceleration(x, y, z);
+    angleY = atan2(y, sqrt(x*x + z*z)) * 180 / PI;
+    angleX = atan2(x, sqrt(y * y + z * z)) * 180 / PI;
+
+    float readingFR = fabs(scaleFR.get_units(10));
     float readingBR = fabs(scaleBR.get_units(10));
     float readingBL = fabs(scaleBL.get_units(10));
-    float readingTL = fabs(scaleTL.get_units(10));
-    float total = readingTR + readingBR + readingBL + readingTL;
+    float readingFL = fabs(scaleFL.get_units(10));
+    float total = readingFR + readingBR + readingBL + readingFL;
     
     Serial.print("HX711 reading: ");
 
-    float rightSideNorm = (readingTR + readingBR) / total; 
-    float leftSideNorm = (readingBL + readingTL) / total;
+    float rightSideNorm = (readingFR + readingBR) / total; 
+    float leftSideNorm = (readingBL + readingFL) / total;
     Serial.print(leftSideNorm); Serial.print(" "); Serial.println(rightSideNorm);
 
     float SI = fabs(rightSideNorm - leftSideNorm) * 100.0f;
@@ -53,15 +72,12 @@ void loop()
     Serial.println(SI);
     Serial.println(CoPx);
 
-    if (SI >= SI_THRESHOLD && CoPx >= CoPx_THRESHOLD)
+    if ((SI >= SI_THRESHOLD && CoPx >= CoPx_THRESHOLD) || (angleY >= MINIMUM_TILT || angleX >= MINIMUM_TILT) || (angleY <= -MINIMUM_TILT || angleX <= -MINIMUM_TILT))
     {
-      //digitalWrite(ledPin, HIGH);
       tone(buzzerPin, 1000);  // strong warning
-      
     }
     else
     {
-      //digitalWrite(ledPin, LOW);
       noTone(buzzerPin);
     }
   } 
