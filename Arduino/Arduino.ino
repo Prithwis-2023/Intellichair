@@ -1,5 +1,6 @@
 #include "HX711.h"
 #include "Arduino_BMI270_BMM150.h"
+#include <ArduinoBLE.h>
 
 #define MINIMUM_TILT 20
 
@@ -18,6 +19,9 @@ const int CoPx_THRESHOLD = 30;  // in mm
 const int buzzerPin = 6;  // passive buzzer
 
 HX711 scaleFR, scaleBR, scaleBL, scaleFL; 
+
+BLEService alertService("180A");  // custom UUID
+BLEByteCharacteristic alertCharacteristic("2A57", BLERead | BLENotify);
 
 void setup() 
 {
@@ -73,7 +77,7 @@ void loop()
 
     if ((SI >= SI_THRESHOLD && CoPx >= CoPx_THRESHOLD) || (angleY >= MINIMUM_TILT || angleX >= MINIMUM_TILT) || (angleY <= -MINIMUM_TILT || angleX <= -MINIMUM_TILT))
     {
-      tone(buzzerPin, 1000);  // strong warning
+      tone(buzzerPin, 1000);
     }
     else
     {
