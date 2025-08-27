@@ -34,10 +34,8 @@ void setup()
     Serial.println("Failed to initialize IMU!");
     while (1);
   }
-  Serial.print("Accelerometer sample rate = ");
-  Serial.print(IMU.accelerationSampleRate());
-  Serial.println(" Hz");
-
+  
+  // Init HX711
   scaleFR.begin(LOADCELL_DOUT_PINS[0], LOADCELL_SCK_PINS[0]);
   scaleBR.begin(LOADCELL_DOUT_PINS[1], LOADCELL_SCK_PINS[1]);
   scaleBL.begin(LOADCELL_DOUT_PINS[2], LOADCELL_SCK_PINS[2]);
@@ -48,10 +46,31 @@ void setup()
   scaleBR.set_scale(CALIBRATIONS[1]);
   scaleBL.set_scale(CALIBRATIONS[2]);
   scaleFL.set_scale(CALIBRATIONS[3]);
+
+  pinMode(buzzerPin, OUTPUT);
+
+  // Init BLE
+  if (!BLE.begin())
+  {
+    Serial.println("Starting BLE failed!");
+    while (1);
+  }
+
+  BLE.setLocalName("TiltMonitor");
+  BLE.setAdvertisedService(alertService);
+  alertService.addCharacteristic(alertCharacteristic);
+  BLE.addService(alertService);
+
+  alertCharacteristic.writeValue(0); // initial value
+
+  BLE.advertise();
+  Serial.println("BLE device is now advertising...");
 }
 
 void loop() 
 {
+  BLE.poll();
+
   if (IMU.accelerationAvailable() && scaleFR.is_ready() && scaleBR.is_ready() && scaleBL.is_ready() && scaleFL.is_ready()) 
   {
     IMU.readAcceleration(x, y, z);
@@ -75,13 +94,17 @@ void loop()
     Serial.println(SI);
     Serial.println(CoPx);
 
-    if ((SI >= SI_THRESHOLD && CoPx >= CoPx_THRESHOLD) || (angleY >= MINIMUM_TILT || angleX >= MINIMUM_TILT) || (angleY <= -MINIMUM_TILT || angleX <= -MINIMUM_TILT))
+    bool alert = ((SI >= SI_THRESHOLD && CoPx >= CoPx_THRESHOLD) || (angleY >= MINIMUM_TILT || angleX >= MINIMUM_TILT) || (angleY <= -MINIMUM_TILT || angleX <= -MINIMUM_TILT))
+    if (alert)
     {
       tone(buzzerPin, 1000);
+      const char* msg = "ALERT! CHAIR FALLING!";
+      alertCharacteristic.writeValue((const unsigned char*)msg, strlen(msg)); // alert
     }
     else
     {
       noTone(buzzerPin);
+      //alertCharacteristic.writeValue(0); // no alert
     }
   } 
   delay(1000); 
