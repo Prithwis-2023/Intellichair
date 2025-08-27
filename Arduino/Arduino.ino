@@ -4,6 +4,20 @@
 
 #define MINIMUM_TILT 5
 
+//FR: 919.43  FL: 396.39  BR: -271.69  BL: 985.72
+
+// void setup()
+// {
+//   // Serial.begin(57600);
+//   // while (!Serial); // wait for serial connection
+//   // scaleBR.begin(2, 9);
+  
+//   // //scaleBR.tare(10);
+//   // Serial.print("Calibration for BR: ");
+//   // scaleBR.calibrate_scale(500);
+//   // Serial.println(scaleBR.get_scale());
+// }
+
 float x, y, z;
 int angleX = 0;
 int angleY = 0;
@@ -11,7 +25,7 @@ int angleY = 0;
 // HX711 circuit wiring
 const int LOADCELL_DOUT_PINS[4] = {2, 3, 4, 5};
 const int LOADCELL_SCK_PINS[4] = {9, 10, 11, 12};
-const float CALIBRATIONS[4] = {1.0, 1.0, 1.0, 1.0};  // accomplished based on the documentation: github.com/RobTillaart/HX711/tree/master
+const float CALIBRATIONS[4] = {919.43, 396.39, -271.69, 985.72};  // accomplished based on the documentation: github.com/RobTillaart/HX711/tree/master
 const int chassisLength = 300;  // TBD
 const int SI_THRESHOLD = 15;
 const int CoPx_THRESHOLD = 30;  // in mm
