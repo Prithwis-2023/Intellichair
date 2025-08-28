@@ -23,9 +23,9 @@ int angleX = 0;
 int angleY = 0;
 
 // HX711 circuit wiring
-const int LOADCELL_DOUT_PINS[4] = {2, 3, 4, 5};
-const int LOADCELL_SCK_PINS[4] = {9, 10, 11, 12};
-const float CALIBRATIONS[4] = {919.43, 396.39, -271.69, 985.72};  // accomplished based on the documentation: github.com/RobTillaart/HX711/tree/master
+const int LOADCELL_DOUT_PINS[4] = {3, 2, 5, 4};
+const int LOADCELL_SCK_PINS[4] = {10, 9, 12, 11};
+const float CALIBRATIONS[4] = {919.43, -271.69, 396.39, 985.72};  // accomplished based on the documentation: github.com/RobTillaart/HX711/tree/master
 const int chassisLength = 300;  // TBD
 const int SI_THRESHOLD = 15;
 const int CoPx_THRESHOLD = 30;  // in mm
@@ -52,14 +52,17 @@ void setup()
   // Init HX711
   scaleFR.begin(LOADCELL_DOUT_PINS[0], LOADCELL_SCK_PINS[0]);
   scaleBR.begin(LOADCELL_DOUT_PINS[1], LOADCELL_SCK_PINS[1]);
-  scaleBL.begin(LOADCELL_DOUT_PINS[2], LOADCELL_SCK_PINS[2]);
-  scaleFL.begin(LOADCELL_DOUT_PINS[3], LOADCELL_SCK_PINS[3]);
+  scaleFL.begin(LOADCELL_DOUT_PINS[2], LOADCELL_SCK_PINS[2]);
+  scaleBL.begin(LOADCELL_DOUT_PINS[3], LOADCELL_SCK_PINS[3]);
+
+  scaleFR.tare(10); scaleBR.tare(10); scaleFL.tare(10); scaleBL.tare(10);
   
   // calibrate the scales
   scaleFR.set_scale(CALIBRATIONS[0]);
   scaleBR.set_scale(CALIBRATIONS[1]);
-  scaleBL.set_scale(CALIBRATIONS[2]);
-  scaleFL.set_scale(CALIBRATIONS[3]);
+  scaleFL.set_scale(CALIBRATIONS[2]);
+  scaleBL.set_scale(CALIBRATIONS[3]);
+  
 
   pinMode(buzzerPin, OUTPUT);
 
@@ -107,7 +110,10 @@ void loop()
         float readingBL = fabs(scaleBL.get_units(10));
         float readingFL = fabs(scaleFL.get_units(10));
         float total = readingFR + readingBR + readingBL + readingFL;
-        
+        Serial.println(readingFR);
+
+        Serial.print("Total: ");
+        Serial.println(total);
         Serial.print("HX711 reading: ");
 
         float rightSideNorm = (readingFR + readingBR) / total; 
@@ -116,17 +122,19 @@ void loop()
 
         float SI = fabs(rightSideNorm - leftSideNorm) * 100.0f;
         float CoPx = (chassisLength * 0.5f) * fabs(rightSideNorm - leftSideNorm);
-        Serial.println(SI);
-        Serial.println(CoPx);
+        //Serial.println(SI);
+        //Serial.println(CoPx);
 
-        bool alert = ((SI >= SI_THRESHOLD && CoPx >= CoPx_THRESHOLD) || (angleY >= MINIMUM_TILT || angleX >= MINIMUM_TILT) || (angleY <= -MINIMUM_TILT || angleX <= -MINIMUM_TILT));
+        bool alert = ((SI >= SI_THRESHOLD || CoPx >= CoPx_THRESHOLD));
         if (alert)
         {
-          tone(buzzerPin, 1000);
-          if ((angleY >= MINIMUM_TILT || angleX >= MINIMUM_TILT) || (angleY <= -MINIMUM_TILT || angleX <= -MINIMUM_TILT))
-          {
-            alertCharacteristic.setValue("DANGER!");
-          }
+          //tone(buzzerPin, 1000);
+          //Serial.println(SI);
+          //Serial.println(CoPx);
+          // if ((angleY >= MINIMUM_TILT || angleX >= MINIMUM_TILT) || (angleY <= -MINIMUM_TILT || angleX <= -MINIMUM_TILT))
+          // {
+          //   alertCharacteristic.setValue("DANGER!");
+          // }
         }
         else
         {
