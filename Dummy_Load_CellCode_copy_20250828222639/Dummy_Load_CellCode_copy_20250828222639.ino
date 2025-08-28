@@ -8,15 +8,15 @@
 #define BR_SCK_PIN 10
 #define SI_THRESHOLD 90
 
-HX711 sFR, sBR;
+HX711 sFR, sBR;  // Front Right and Back Right Load Cells
 
-const float CALIBRATIONS[4] = {954.76, -291.17, 396.39, 985.72}; 
+const float CALIBRATIONS[4] = {954.76, -291.17, 396.39, 985.72};  // Calibration values for the load cells
 
 const int buzzerPin = 6;
 
-float x, y, z;
-int angleX = 0;
-int angleY = 0;
+float x, y, z;    // Variables to hold accelerometer data
+int angleX = 0;  // Variable to hold calculated angles
+int angleY = 0; // Variable to hold calculated angles
 
 void setup()
 {
@@ -45,20 +45,22 @@ void loop()
 {
   if (IMU.accelerationAvailable() && sFR.is_ready() && sBR.is_ready())
   {
+   /* Load Cell Analysis */ 
     long rFR = fabs(sFR.get_units());
     long rBR = fabs(sBR.get_units());
-    //Serial.print(rFR); Serial.print(" "); Serial.println(rBR); //Serial.print(" "); //Serial.println(rFL);
     float total = rFR + rBR;
     float leftNorm = rBR / total;  float rightNorm = rFR / total;
-    Serial.print(leftNorm); Serial.print(" "); Serial.println(rightNorm);
+    Serial.print(leftNorm); Serial.print(" "); Serial.println(rightNorm);  //
     float SI = fabs(rightNorm - leftNorm) * 100.0f; 
     float CoPx = (300 * 0.5f) * fabs(rightNorm - leftNorm);
 
+    /* Accelerometer Analysis */
     IMU.readAcceleration(x, y, z);
     angleY = atan2(y, sqrt(x*x + z*z)) * 180 / PI;
     angleX = atan2(x, sqrt(y * y + z * z)) * 180 / PI;
 
-    if ((angleY > 5 || angleY <-5) || (angleX > 5 || angleX < -5))
+    /* If the chair is falling or the person is slouching, buzz*/
+    if ((SI > SI_THRESHOLD) || (angleY > 5 || angleY <-5) || (angleX > 5 || angleX < -5))
     {
       tone(buzzerPin, 500);
       delay(1000);
