@@ -16,7 +16,46 @@ The sensor module consists of a load cell paired with an HX711 amplifier.
 
 - **HX711 Amplifier:** A precision 24-bit ADC (Analog-to-Digital Converter) specifically designed for weight scales. It converts the tiny electrical signals from the load cells into readable digital values for the Arduino.
 
-## Research Summary
+### Power  
+- Can be powered via USB or external protoboard supply.  
+- Must provide stable 5V to VIN (or regulated 3.3V to 3V3 pin).
+
+### Working Principle
+1. **Weight Measurement**  
+   - Each load cell outputs a small voltage proportional to applied force.  
+   - HX711 modules amplify and convert this to digital values.  
+   - Arduino reads the data using calibrated scale factors.
+
+2. **Calibration**  
+   - Each load cell is assigned a **calibration constant**.  
+   - This converts raw readings into grams/kilograms.  
+   - Taring ensures the chair reads **0** when empty.
+
+3. **Posture Detection**  
+   - **Total Load** = sum of all four load cells.  
+   - **Symmetry Index (SI)** is computed.
+   - Shifts in SI indicate leaning forward, backward, or sideways.
+
+4. **Tilt/Fall Detection:**  
+     - If one or more legs suddenly read **zero or near-zero load**,  
+     - OR if SI shifts beyond a defined safety threshold,  
+     - The system concludes the chair is tipping or has fallen.
+	 - Upon detecting a **fall event**, Arduino sends a BLE/IoT signal.  
+     - The **smart home system** immediately relays a **distress alert**  (e.g., SMS, app notification, or emergency call).  
+
+5. **Output**  
+   - Data printed to Serial Monitor (or transmitted via BLE).  
+   - Can be used to:  
+     - Detect bad posture.  
+     - Alert user when leaning too much.  
+     - Track sitting patterns over time.
+
+## Example Use Cases
+- Elderly users → monitor sitting posture to prevent falls.  
+- Office workers → track ergonomics and prevent back pain.  
+- Rehabilitation → provide feedback during physical therapy.  
+
+### Research Summary
 There are two pathways of quantification - symmetry based metrics and Center of Pressure (CoP) based metric.
 
 #### Symmetry Based Metrics
