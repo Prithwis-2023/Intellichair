@@ -23,6 +23,9 @@ float x, y, z;    // Variables to hold accelerometer data
 int angleX = 0;  // Variable to hold calculated angles
 int angleY = 0; // Variable to hold calculated angles
 
+BLEService alertService("180A");  // custom UUID
+BLECharacteristic alertCharacteristic("2A57", BLERead | BLENotify, 50);
+
 void setup()
 {
   Serial.begin(9600);
@@ -51,6 +54,12 @@ void setup()
   s2.set_scale(CALIBRATIONS[3]);
 
   pinMode(buzzerPin, OUTPUT);
+
+  BLE.setLocalName("TiltMonitor");
+  BLE.setAdvertisedService(alertService);
+  alertService.addCharacteristic(alertCharacteristic);
+  BLE.addService(alertService);
+
 }
 
 void loop()
@@ -77,7 +86,7 @@ void loop()
     /* If the chair is falling or the person is slouching, buzz*/
     if ((SI > SI_MAX_THRESHOLD) || (SI <= SI_MIN_THRESHOLD) || (angleY > 5 || angleY <-5) || (angleX > 5 || angleX < -5))
     {
-      tone(buzzerPin, 500);
+      tone(buzzerPin, 2000);
       delay(1000);
       noTone(buzzerPin);
       delay(1000);
