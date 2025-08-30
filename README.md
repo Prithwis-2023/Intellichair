@@ -2,7 +2,7 @@
 <img width="1097" height="543" alt="image" src="https://github.com/user-attachments/assets/ab02113c-0a97-4d13-b0fd-c7df51466992" />
 
 ## Hardware
-- Arduino Uno / Nano (microcontroller)
+- Arduino Nano 33 BLE Rev2 (microcontroller)
 
 - 4 × Full Bridge Load Cells (weight sensors)
 
