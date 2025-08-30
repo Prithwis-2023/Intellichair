@@ -1,7 +1,12 @@
 # 🪑 Intellichair
 <img width="1097" height="543" alt="image" src="https://github.com/user-attachments/assets/ab02113c-0a97-4d13-b0fd-c7df51466992" />
 
-## Hardware
+### Overview
+The chair is equipped with **four load cells** (Front-Right, Front-Left, Back-Right, Back-Left) mounted at the legs.  
+These sensors continuously measure weight distribution to monitor **posture, balance, tilt, and sitting behavior**.  
+If the chair **falls or tilts beyond a safe threshold**, the system automatically triggers a **distress message** through the connected smart home network.
+
+### Hardware
 - Arduino Nano 33 BLE Rev2 (microcontroller)
 
 - 4 × Full Bridge Load Cells (weight sensors)
