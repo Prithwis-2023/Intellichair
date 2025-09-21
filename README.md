@@ -138,3 +138,10 @@ Intellichair addresses this via **dual metrics + thresholds + hysteresis filteri
 [2]: Kumar, Senthil NS, et al. "Evaluation of limb load asymmetry using two new mathematical models." Global Journal of Health Science 7.2 (2014): 1.
 
 [3]: Bartlett, Harrison L., Lena H. Ting, and Jeffrey T. Bingham. "Accuracy of force and center of pressure measures of the Wii Balance Board." Gait & posture 39.1 (2014): 224-228.
+
+---
+
+## 📜 Credits
+Designed and Developed by Azizbek Kayumov, 최종우 and Prithwis Das
+
+---
