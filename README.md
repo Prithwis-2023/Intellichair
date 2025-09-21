@@ -1,5 +1,26 @@
-# 🪑 Intellichair
-<img width="1097" height="543" alt="image" src="https://github.com/user-attachments/assets/ab02113c-0a97-4d13-b0fd-c7df51466992" />
+# 
+<p align="center">
+	<img width="600" height="600" alt="image" src="https://github.com/user-attachments/assets/ab02113c-0a97-4d13-b0fd-c7df51466992" />
+</p>
+<h1 align="center"><b>🪑 Intellichair</b></h1>
+<p align="center">Smart Seating Solution for the Elderly Individuals</p>
+
+---
+
+## 🌟 Introduction
+**Intellichair** is a **smart posture and fall-detection chair** designed to improve safety, ergonomics, and rehabilitation monitoring.  
+
+It uses **four load cells** (mounted at the chair legs) to continuously monitor **weight distribution** and **balance**. By computing both **Symmetry Index (SI)** and **Center of Pressure (CoP)** metrics — widely used in biomechanics — Intellichair can:  
+- Detect **bad posture** (leaning left, right, forward, or backward).  
+- Alert when **imbalance or tilt exceeds safe limits**.  
+- Recognize **chair tip-over or fall events** and send **distress alerts** through IoT/Smart Home systems.  
+
+Intellichair combines **low-cost hardware** (Arduino + load cells) with **clinical-grade concepts** from biomechanics research, making it useful for:  
+- 🧓 Elderly fall-prevention  
+- 💺 Office ergonomics & productivity  
+- 🏥 Rehabilitation & physical therapy feedback  
+
+---
 
 ### Overview
 The chair is equipped with **four load cells** (Front-Right, Front-Left, Back-Right, Back-Left) mounted at the legs.  
@@ -107,7 +128,7 @@ Both **SI (Symmetry Index)** and **CoP (Center of Pressure)** methods face the _
 	-  Seat size matters (5 cm shift on a 30 cm seat is big, but on a 60 cm seat it’s small).
 	-  People wiggle naturally — how much deviation is actually “bad”?
 
-
+Intellichair addresses this via **dual metrics + thresholds + hysteresis filtering**.
 
 
 ## References
